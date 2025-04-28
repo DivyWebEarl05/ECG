@@ -24,18 +24,30 @@ const createPrivacyPolicy = async (req, res) => {
 
 const getAllPrivacyPolicy = async (req, res) => {
     try {
-        const getprivacypolicy =  await PrivacyPolicy.find({}).sort({ createdAt: -1 });
-        res.status(200).json({
-            message: "PrivacyPolicy fetched successfully",
-            getprivacypolicy
-        })        
+      const page = parseInt(req.query.page) || 1; // default page = 1
+      const limit = parseInt(req.query.limit) || 10; // default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalPrivacyPolicies = await PrivacyPolicy.countDocuments();
+      const getprivacypolicy = await PrivacyPolicy.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+  
+      res.status(200).json({
+        message: "PrivacyPolicy fetched successfully",
+        page,
+        totalPages: Math.ceil(totalPrivacyPolicies / limit),
+        totalPrivacyPolicies,
+        getprivacypolicy,
+      });
     } catch (error) {
-        res.status(500).json({
-            message: "Error fetching PrivacyPolicy",
-            error: error.messsage,
-        })
+      res.status(500).json({
+        message: "Error fetching PrivacyPolicy",
+        error: error.message,
+      });
     }
-}
+} 
 
 const getPrivacyPolicyById = async (req, res) => {
     try {

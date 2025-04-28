@@ -116,12 +116,23 @@ const updatePlan = async (req, res) => {
 
 const getAllPlans = async (req, res) => {
   try {
-    const plans = await Plan.find();
-    res.json(plans);
+    const page = parseInt(req.query.page) || 1; // default page is 1
+    const limit = parseInt(req.query.limit) || 10; // default limit is 10
+    const skip = (page - 1) * limit;
+
+    const totalPlans = await Plan.countDocuments();
+    const plans = await Plan.find().skip(skip).limit(limit);
+
+    res.json({
+      page,
+      totalPages: Math.ceil(totalPlans / limit),
+      totalPlans,
+      plans
+    });
   } catch (error) {
     res.status(500).json({ message: "Read all failed", error: error.message });
   }
-};
+}
 
 const getPlanById = async (req, res) => {
   try {

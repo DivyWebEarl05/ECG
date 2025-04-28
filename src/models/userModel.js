@@ -46,6 +46,12 @@ const userSchema = new mongoose.Schema({
     height: {
         type: Number,
     },
+     
+    status: {
+        type: String,
+        enum: ['active', 'blocked'],
+        default: 'active'
+    },
 }, 
 {
     timestamps: {

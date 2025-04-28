@@ -24,18 +24,30 @@ const createHelp = async (req, res) => {
 
 const getAllHelp = async (req, res) => {
     try {
-        const gethelp =  await Help.find({}).sort({ createdAt: -1 });
-        res.status(200).json({
-            message: "Help & Support fetched successfully",
-            gethelp
-        })        
+      const page = parseInt(req.query.page) || 1; // default page = 1
+      const limit = parseInt(req.query.limit) || 10; // default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalHelps = await Help.countDocuments();
+      const gethelp = await Help.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+  
+      res.status(200).json({
+        message: "Help & Support fetched successfully",
+        page,
+        totalPages: Math.ceil(totalHelps / limit),
+        totalHelps,
+        gethelp,
+      });
     } catch (error) {
-        res.status(500).json({
-            message: "Error fetching articles",
-            error: error.messsage,
-        })
+      res.status(500).json({
+        message: "Error fetching Help & Support",
+        error: error.message,
+      });
     }
-}
+} 
 
 const getHelpById = async (req, res) => {
     try {

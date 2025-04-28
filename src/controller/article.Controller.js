@@ -27,16 +27,28 @@ const createArticle = async (req, res) => {
 
 const getAllArticles = async (req, res) => {
     try {
-        const articles =  await Article.find({}).sort({ createdAt: -1 });
-        res.status(200).json({
-            message: "Articles fetched successfully",
-            articles
-        })        
+      const page = parseInt(req.query.page) || 1; // Default page = 1
+      const limit = parseInt(req.query.limit) || 10; // Default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalArticles = await Article.countDocuments();
+      const articles = await Article.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+  
+      res.status(200).json({
+        message: "Articles fetched successfully",
+        page,
+        totalPages: Math.ceil(totalArticles / limit),
+        totalArticles,
+        articles
+      });
     } catch (error) {
-        res.status(500).json({
-            message: "Error fetching articles",
-            error: error.messsage,
-        })
+      res.status(500).json({
+        message: "Error fetching articles",
+        error: error.message,
+      });
     }
 }
 

@@ -88,14 +88,25 @@ const updateTest = async (req, res) => {
 };
 
 const getAllTest = async (req, res) => {
-  try {
-    const tests = await Test.find();
-    res.json(tests);
-  } catch (error) {
-    res.status(500).json({ message: "Read all failed", error: error.message });
-  }
-};
-
+    try {
+      const page = parseInt(req.query.page) || 1; // Default page = 1
+      const limit = parseInt(req.query.limit) || 10; // Default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalTests = await Test.countDocuments();
+      const tests = await Test.find().skip(skip).limit(limit);
+  
+      res.json({
+        page,
+        totalPages: Math.ceil(totalTests / limit),
+        totalTests,
+        tests
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Read all failed", error: error.message });
+    }
+}
+  
 const getTestById = async (req, res) => {
     try {
         const test = await Test.findById(req.params.id);

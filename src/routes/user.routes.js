@@ -5,7 +5,7 @@ import {
   getUserProfile, 
   updateUserProfile,
   changePassword,
-  // forgetPassword
+  forgetPassword
   // deleteUserProfile 
 } from '../controller/user.Controller.js';
 
@@ -54,7 +54,7 @@ router.post('/signin', SignIn);
 router.get('/getprofile', protect, getUserProfile);
 router.put('/updateprofile', protect, updateUserProfile);
 router.put('/changepassword', protect, changePassword);
-// router.post("/forgotPassword", forgetPassword);
+router.post("/forgotPassword", forgetPassword);
 // router.delete('/deleteprofile', protect, deleteUserProfile);
 
 // GET Plan

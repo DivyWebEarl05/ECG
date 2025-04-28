@@ -6,6 +6,8 @@ import {
     updateappAdminProfile,
     appAdminchangePassword,
     getAllUser,
+    getUserById,
+    userStatusUpdate,
     deleteUser
     // appAdmindeleteUserProfile
 } from '../controller/appAdmin.Controller.js';
@@ -19,6 +21,8 @@ router.get('/getadminprofile', AppAdminprotect, getappAdminProfile);
 router.put('/updateprofile', AppAdminprotect, updateappAdminProfile);
 router.put('/changepassword', AppAdminprotect, appAdminchangePassword);
 router.get('/getAllUser', AppAdminprotect, getAllUser);
+router.get('/getUserById/:id',AppAdminprotect, getUserById);
+router.patch('/userStatus/:id', AppAdminprotect, userStatusUpdate);
 router.delete('/deleteUser/:id', AppAdminprotect, deleteUser);
 // router.delete('/deleteprofile', AppAdminprotect, appAdmindeleteUserProfile);
 

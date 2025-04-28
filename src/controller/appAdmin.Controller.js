@@ -141,12 +141,69 @@ const appAdminchangePassword = async (req, res) => {
 
 const getAllUser = async (req, res) => {
     try {
-        const users = await User.find();
-        res.json(users);
-      } catch (error) {
-        res.status(500).json({ message: "Read all failed", error: error.message });
-      }
+      const page = parseInt(req.query.page) || 1; // Default page = 1
+      const limit = parseInt(req.query.limit) || 10; // Default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalUsers = await User.countDocuments();
+      const users = await User.find().skip(skip).limit(limit);
+  
+      res.json({
+        page,
+        totalPages: Math.ceil(totalUsers / limit),
+        totalUsers,
+        users
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Read all failed", error: error.message });
+    }
 }
+
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Read failed", error: error.message });
+    }
+}
+
+const userStatusUpdate = async (req, res) => {
+    try {
+        const { status } = req.body;
+
+        if (!['active', 'blocked'].includes(status)) {
+            return res.status(400).json({ 
+                message: "Invalid status value. Must be either 'active' or 'blocked'" 
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: `User ${status === 'blocked' ? 'blocked' : 'activated'} successfully`,
+            user
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            message: "Failed to update user status", 
+            error: error.message
+        });
+    }
+};
+
+
 
 const deleteUser = async (req, res) => {
     try {
@@ -157,7 +214,8 @@ const deleteUser = async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: "Delete failed", error: error.message });
     }
-  };
+}
+
 // const appAdmindeleteUserProfile = async (req, res) => {
 //     try {
 //         const user = await User.findByIdAndDelete(req.user._id);
@@ -180,6 +238,8 @@ export {
     updateappAdminProfile,
     appAdminchangePassword,
     getAllUser,
+    getUserById,
+    userStatusUpdate,
     deleteUser
     // appAdmindeleteUserProfile
 };

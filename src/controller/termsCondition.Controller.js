@@ -24,18 +24,31 @@ const createTermsCondition = async (req, res) => {
 
 const getAllTermsCondition = async (req, res) => {
     try {
-        const gettermscondition =  await TermsCondition.find({}).sort({ createdAt: -1 });
-        res.status(200).json({
-            message: "Terms & Condition fetched successfully",
-            gettermscondition
-        })        
+      const page = parseInt(req.query.page) || 1; // default page = 1
+      const limit = parseInt(req.query.limit) || 10; // default limit = 10
+      const skip = (page - 1) * limit;
+  
+      const totalTerms = await TermsCondition.countDocuments();
+      const gettermscondition = await TermsCondition.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+  
+      res.status(200).json({
+        message: "Terms & Condition fetched successfully",
+        page,
+        totalPages: Math.ceil(totalTerms / limit),
+        totalTerms,
+        gettermscondition,
+      });
     } catch (error) {
-        res.status(500).json({
-            message: "Error fetching Terms & Condition",
-            error: error.messsage,
-        })
+      res.status(500).json({
+        message: "Error fetching Terms & Condition",
+        error: error.message,
+      });
     }
 }
+  
 
 const getTermsConditionById = async (req, res) => {
     try {

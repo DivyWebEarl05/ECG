@@ -97,6 +97,7 @@ const getUserProfile = async (req, res) => {
             gender: user.gender,
             weight: user.weight,
             height: user.height,
+            status: user.status,
         });
     } catch (error) {
         console.error(error);
@@ -165,28 +166,28 @@ const changePassword = async (req, res) => {
     }
 };
 
-// const forgetPassword = async (req, res) => {
-//     try {
-//         const { email, phoneNumber, newPassword } = req.body;
+const forgetPassword = async (req, res) => {
+    try {
+        const { email, phoneNumber, newPassword } = req.body;
 
-//         if (!email && !phoneNumber) {
-//             return res.status(400).json({ success: false, message: 'Email or PhoneNumber is required' });
-//         }
+        if (!email && !phoneNumber) {
+            return res.status(400).json({ success: false, message: 'Email or PhoneNumber is required' });
+        }
 
-//         const user = await User.findOne({ $or: [{ email }, { phoneNumber }] });
-//         if (!user) {
-//             return res.status(404).json({ success: false, message: 'No user found with this email or PhoneNumber' });
-//         }
+        const user = await User.findOne({ $or: [{ email }, { phoneNumber }] });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No user found with this email or PhoneNumber' });
+        }
 
-//         const hashedPassword = await bcrypt.hash(newPassword, 10);
-//         user.password = hashedPassword;
-//         await user.save();
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
 
-//         return res.status(200).json({ success: true, message: 'Password changed successfully' });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// }
+        return res.status(200).json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 // const deleteUserProfile = async (req, res) => {
 //     try {
@@ -209,6 +210,6 @@ export {
     getUserProfile,
     updateUserProfile,
     changePassword,
-    // forgetPassword
+    forgetPassword
     // deleteUserProfile
 }
