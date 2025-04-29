@@ -33,6 +33,12 @@ import TermsCondition from "./src/routes/termsCondition.routes.js";
 // Coupon 
 import Coupon from "./src/routes/coupon.routes.js";
 
+// appliedCoupon
+import AppliedCoupon from "./src/routes/appliedCoupon.routes.js";
+
+// Device
+import Device from './src/routes/device.routes.js'
+
 dotenv.config();
 
 const app = express();
@@ -53,6 +59,8 @@ app.use('/api/help', helpRoutes)
 app.use('/api/privacypolicy', PrivacyPolicy)
 app.use('/api/termscondition', TermsCondition)
 app.use('/api/coupon', Coupon)
+app.use('/api/appliedCoupon', AppliedCoupon)
+app.use('/api/device', Device )
 
 // IN case Fail Config db.js
 connectDB()
