@@ -8,6 +8,7 @@ import {
     getAllUser,
     getUserById,
     userStatusUpdate,
+    getUserWithFamilyById,
     deleteUser
     // appAdmindeleteUserProfile
 } from '../controller/appAdmin.Controller.js';
@@ -23,6 +24,7 @@ router.put('/changepassword', AppAdminprotect, appAdminchangePassword);
 router.get('/getAllUser', AppAdminprotect, getAllUser);
 router.get('/getUserById/:id',AppAdminprotect, getUserById);
 router.patch('/userStatus/:id', AppAdminprotect, userStatusUpdate);
+router.get('/user-with-family/:id', getUserWithFamilyById);
 router.delete('/deleteUser/:id', AppAdminprotect, deleteUser);
 // router.delete('/deleteprofile', AppAdminprotect, appAdmindeleteUserProfile);
 

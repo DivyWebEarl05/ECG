@@ -1,5 +1,6 @@
 import AppAdmin from '../models/appAdminModel.js';
-import User from '../models/userModel.js'
+import User from '../models/userModel.js';
+import AddedUser from '../models/userAddModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -203,8 +204,6 @@ const userStatusUpdate = async (req, res) => {
     }
 };
 
-
-
 const deleteUser = async (req, res) => {
     try {
       const deleteUser = await User.findByIdAndDelete(req.params.id);
@@ -215,6 +214,59 @@ const deleteUser = async (req, res) => {
       res.status(500).json({ message: "Delete failed", error: error.message });
     }
 }
+
+const getUserWithFamilyById = async (req, res) => {
+    try {
+        const { id } = req.params; // Get user id from URL
+
+        // Find the main user
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Main user not found',
+            });
+        }
+
+        // Find family members created by this user
+        const familyMembers = await AddedUser.find({ createdBy: user._id });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                mainUser: {
+                    id: user._id,
+                    full_name: user.full_name,
+                    email: user.email,
+                    phoneNumber: user.phoneNumber,
+                    age: user.age,
+                    gender: user.gender,
+                    weight: user.weight,
+                    height: user.height,
+                    status: user.status,
+                },
+                familyMembers: familyMembers.map(member => ({
+                    id: member._id,
+                    full_name: member.full_name,
+                    relation: member.relation,
+                    age: member.age,
+                    gender: member.gender,
+                    weight: member.weight,
+                    height: member.height,
+                }))
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error',
+        });
+    }
+};
+
 
 // const appAdmindeleteUserProfile = async (req, res) => {
 //     try {
@@ -240,6 +292,7 @@ export {
     getAllUser,
     getUserById,
     userStatusUpdate,
+    getUserWithFamilyById,
     deleteUser
     // appAdmindeleteUserProfile
 };

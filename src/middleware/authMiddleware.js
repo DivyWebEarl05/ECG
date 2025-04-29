@@ -27,6 +27,7 @@ const AppAdminprotect = async (req, res, next) => {
     }
 };
 
+
 const protect = async (req, res, next) => {
     try {
         // console.log("Headers:", req.headers); // Debugging log

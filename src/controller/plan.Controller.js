@@ -1,4 +1,6 @@
 import Plan from "../models/planModel.js";
+const BASE_URL = "https://ecg-wv62.onrender.com/uploads/plans/"
+// const BASE_URL = "http://localhost:5000/uploads/plans/"
 
 function combineSchedule(weekNumbers, weekDescriptions) {
   const schedule = [];
@@ -10,7 +12,10 @@ function combineSchedule(weekNumbers, weekDescriptions) {
         week_description: weekDescriptions[i],
       });
     }
-  } else if (typeof weekNumbers === "string" && typeof weekDescriptions === "string") {
+  } else if (
+    typeof weekNumbers === "string" &&
+    typeof weekDescriptions === "string"
+  ) {
     schedule.push({
       weekNumber: weekNumbers,
       week_description: weekDescriptions,
@@ -38,7 +43,7 @@ const createPlan = async (req, res) => {
 
     const newPlan = new Plan({
       title,
-      photo: req.file?.path,
+      photo: req.file?.filename,
       categoty,
       description,
       duration_in_day,
@@ -68,11 +73,12 @@ const updatePlan = async (req, res) => {
       title2,
       description2,
       weekNumber,
-      week_description
+      week_description,
     } = req.body;
 
     const existingPlan = await Plan.findById(req.params.id);
-    if (!existingPlan) return res.status(404).json({ message: 'Plan not found' });
+    if (!existingPlan)
+      return res.status(404).json({ message: "Plan not found" });
 
     const newSchedule = [];
     if (weekNumber && week_description) {
@@ -96,21 +102,22 @@ const updatePlan = async (req, res) => {
     existingPlan.title = title || existingPlan.title;
     existingPlan.categoty = categoty || existingPlan.categoty;
     existingPlan.description = description || existingPlan.description;
-    existingPlan.duration_in_day = duration_in_day || existingPlan.duration_in_day;
+    existingPlan.duration_in_day =
+      duration_in_day || existingPlan.duration_in_day;
     existingPlan.times_per_week = times_per_week || existingPlan.times_per_week;
     existingPlan.difficulty = difficulty || existingPlan.difficulty;
     existingPlan.title2 = title2 || existingPlan.title2;
     existingPlan.description2 = description2 || existingPlan.description2;
     existingPlan.schedule = updatedSchedule;
 
-    if (req.file?.path) {
-      existingPlan.photo = req.file.path;
+    if (req.file?.filename) {
+      existingPlan.photo = req.file.filename;
     }
 
     const updatedPlan = await existingPlan.save();
     res.json(updatedPlan);
   } catch (error) {
-    res.status(500).json({ message: 'Update failed', error: error.message });
+    res.status(500).json({ message: "Update failed", error: error.message });
   }
 };
 
@@ -121,24 +128,36 @@ const getAllPlans = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const totalPlans = await Plan.countDocuments();
-    const plans = await Plan.find().skip(skip).limit(limit);
+    let plans = await Plan.find().skip(skip).limit(limit);
+
+    // Add base URL to photos
+    plans = plans.map(plan => {
+      const planObj = plan.toObject();
+      if (planObj.photo) {
+        planObj.photo = BASE_URL + planObj.photo;
+      }
+      return planObj;
+    });
 
     res.json({
       page,
       totalPages: Math.ceil(totalPlans / limit),
       totalPlans,
-      plans
+      plans,
     });
   } catch (error) {
     res.status(500).json({ message: "Read all failed", error: error.message });
   }
-}
+};
 
 const getPlanById = async (req, res) => {
   try {
     const plan = await Plan.findById(req.params.id);
-    if (!plan) 
-      return res.status(404).json({ message: "Plan not found" });
+
+    plan.photo = BASE_URL + plan.photo
+
+    if (!plan) return res.status(404).json({ message: "Plan not found" });
+
     res.json(plan);
   } catch (error) {
     res.status(500).json({ message: "Read one failed", error: error.message });
@@ -148,18 +167,12 @@ const getPlanById = async (req, res) => {
 const deletePlan = async (req, res) => {
   try {
     const deletedPlan = await Plan.findByIdAndDelete(req.params.id);
-    if (!deletedPlan) 
+    if (!deletedPlan)
       return res.status(404).json({ message: "Plan not found" });
-      res.json({ message: "Plan deleted successfully" });
+    res.json({ message: "Plan deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Delete failed", error: error.message });
   }
 };
 
-export { 
-    createPlan, 
-    getAllPlans, 
-    updatePlan, 
-    getPlanById, 
-    deletePlan 
-};
+export { createPlan, getAllPlans, updatePlan, getPlanById, deletePlan };

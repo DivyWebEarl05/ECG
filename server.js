@@ -37,6 +37,7 @@ const app = express();
 app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+// app.use('/plan', express.static('uploads/plans'));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/appAdmin", appAdminRoutes)
