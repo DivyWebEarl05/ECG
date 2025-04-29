@@ -18,7 +18,7 @@ const planSchema = new mongoose.Schema({
         required: true
     },
     
-    categoty :{
+    category :{
         type: String,   
         enum: ['Meal Plan', 'Meditation', 'Exercises']
     },
@@ -65,6 +65,12 @@ const planSchema = new mongoose.Schema({
           }
         }
     ],
+
+    status: {
+        type: String,
+        enum: ['Basic', 'Pro','Premium'],
+        default: 'Basic'
+    },
 }, 
 {
     timestamps: {

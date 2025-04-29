@@ -1,6 +1,6 @@
 import Article from "../models/articlesModel.js";
-// const BASE_URL = "https://ecg-wv62.onrender.com/uploads/article/"
-const BASE_URL = "http://localhost:5000/uploads/article/"
+const BASE_URL = "https://ecg-wv62.onrender.com/uploads/article/"
+// const BASE_URL = "http://localhost:5000/uploads/article/"
 
 const createArticle = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { 
-    appAdminSignUp,
+    // appAdminSignUp,
     appAdminSignIn,
     getappAdminProfile,
     updateappAdminProfile,
@@ -16,7 +16,7 @@ import { AppAdminprotect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/register', appAdminSignUp);
+// router.post('/register', appAdminSignUp);
 router.post('/login', appAdminSignIn);
 router.get('/getadminprofile', AppAdminprotect, getappAdminProfile);
 router.put('/updateprofile', AppAdminprotect, updateappAdminProfile);

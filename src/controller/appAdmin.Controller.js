@@ -10,40 +10,40 @@ const generateToken = (userId) => {
     });
 };
 
-const appAdminSignUp = async (req, res) => {
-    const { email, phoneNumber, password } = req.body;
+// const appAdminSignUp = async (req, res) => {
+//     const { email, phoneNumber, password } = req.body;
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+//     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: 'Invalid email format' });
-    }
+//     if (!emailRegex.test(email)) {
+//         return res.status(400).json({ message: 'Invalid email format' });
+//     }
 
-    try {
-        const adminExists = await AppAdmin.findOne({ $or: [{ email }, { phoneNumber }] });
+//     try {
+//         const adminExists = await AppAdmin.findOne({ $or: [{ email }, { phoneNumber }] });
 
-        if (adminExists) {
-            return res.status(400).json({ message: 'AppAdmin already exists with this email/phone number' });
-        }
+//         if (adminExists) {
+//             return res.status(400).json({ message: 'AppAdmin already exists with this email/phone number' });
+//         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+//         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const admin = await AppAdmin.create({
-            email,
-            phoneNumber,
-            password: hashedPassword,
-        });
+//         const admin = await AppAdmin.create({
+//             email,
+//             phoneNumber,
+//             password: hashedPassword,
+//         });
 
-        res.status(201).json({
-            _id: admin._id,
-            email: admin.email,
-            phoneNumber: admin.phoneNumber,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error registering user' });
-    }
-};
+//         res.status(201).json({
+//             _id: admin._id,
+//             email: admin.email,
+//             phoneNumber: admin.phoneNumber,
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Error registering user' });
+//     }
+// };
 
 const appAdminSignIn = async (req, res) => {
     const { email, phoneNumber, password } = req.body;
@@ -55,11 +55,14 @@ const appAdminSignIn = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email/phone number or password' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        // const isMatch = await bcrypt.compare(password, user.password);
+        // if (!isMatch) {
+        //     return res.status(401).json({ message: 'Invalid email/phone number or password' });
+        // }
+        if (password !== user.password) {
             return res.status(401).json({ message: 'Invalid email/phone number or password' });
         }
-
+        
         const token = generateToken(user._id);
 
         res.status(200).json({
@@ -284,7 +287,7 @@ const getUserWithFamilyById = async (req, res) => {
 // };
 
 export {
-    appAdminSignUp,
+    // appAdminSignUp,
     appAdminSignIn,
     getappAdminProfile,
     updateappAdminProfile,

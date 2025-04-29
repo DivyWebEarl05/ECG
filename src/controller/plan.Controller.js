@@ -28,7 +28,7 @@ const createPlan = async (req, res) => {
   try {
     const {
       title,
-      categoty,
+      category,
       description,
       duration_in_day,
       times_per_week,
@@ -44,7 +44,7 @@ const createPlan = async (req, res) => {
     const newPlan = new Plan({
       title,
       photo: req.file?.filename,
-      categoty,
+      category,
       description,
       duration_in_day,
       times_per_week,
@@ -65,7 +65,7 @@ const updatePlan = async (req, res) => {
   try {
     const {
       title,
-      categoty,
+      category,
       description,
       duration_in_day,
       times_per_week,
@@ -100,7 +100,7 @@ const updatePlan = async (req, res) => {
     const updatedSchedule = [...existingPlan.schedule, ...newSchedule];
 
     existingPlan.title = title || existingPlan.title;
-    existingPlan.categoty = categoty || existingPlan.categoty;
+    existingPlan.category = category || existingPlan.category;
     existingPlan.description = description || existingPlan.description;
     existingPlan.duration_in_day =
       duration_in_day || existingPlan.duration_in_day;

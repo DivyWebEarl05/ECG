@@ -30,6 +30,9 @@ import PrivacyPolicy from "./src/routes/privacypolicy.routes.js";
 // Terms & Condition
 import TermsCondition from "./src/routes/termsCondition.routes.js";
 
+// Coupon 
+import Coupon from "./src/routes/coupon.routes.js";
+
 dotenv.config();
 
 const app = express();
@@ -49,6 +52,7 @@ app.use("/api/article", articleRoutes)
 app.use('/api/help', helpRoutes)
 app.use('/api/privacypolicy', PrivacyPolicy)
 app.use('/api/termscondition', TermsCondition)
+app.use('/api/coupon', Coupon)
 
 // IN case Fail Config db.js
 connectDB()
