@@ -4,7 +4,8 @@ import {
     getAllPlans, 
     updatePlan, 
     getPlanById, 
-    deletePlan 
+    deletePlan ,
+    planStatusUpdate
 } from '../controller/plan.Controller.js';
 import planupload from '../middleware/planmulter.js';
 import { AppAdminprotect } from '../middleware/authMiddleware.js'
@@ -15,5 +16,6 @@ router.get('/getAllPlan', AppAdminprotect, getAllPlans);
 router.get('/getById/:id', AppAdminprotect, getPlanById);
 router.put('/update/:id', planupload.single('photo'), AppAdminprotect, updatePlan);
 router.delete('/delete/:id', AppAdminprotect, deletePlan);
+router.patch('/statusUpdate/:id', AppAdminprotect, planStatusUpdate);
 
 export default router;

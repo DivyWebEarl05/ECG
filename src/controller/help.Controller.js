@@ -24,8 +24,8 @@ const createHelp = async (req, res) => {
 
 const getAllHelp = async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1; // default page = 1
-      const limit = parseInt(req.query.limit) || 10; // default limit = 10
+      const page = parseInt(req.query.page) || 1;
+      const limit = 50; 
       const skip = (page - 1) * limit;
   
       const totalHelps = await Help.countDocuments();
@@ -39,6 +39,7 @@ const getAllHelp = async (req, res) => {
         page,
         totalPages: Math.ceil(totalHelps / limit),
         totalHelps,
+        resultsOnPage: gethelp.length,
         gethelp,
       });
     } catch (error) {
@@ -47,7 +48,8 @@ const getAllHelp = async (req, res) => {
         error: error.message,
       });
     }
-} 
+  };
+  
 
 const getHelpById = async (req, res) => {
     try {

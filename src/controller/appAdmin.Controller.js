@@ -145,21 +145,29 @@ const appAdminchangePassword = async (req, res) => {
 
 const getAllUser = async (req, res) => {
     try {
-      const page = parseInt(req.query.page) || 1; // Default page = 1
-      const limit = parseInt(req.query.limit) || 10; // Default limit = 10
-      const skip = (page - 1) * limit;
-  
-      const totalUsers = await User.countDocuments();
-      const users = await User.find().skip(skip).limit(limit);
-  
-      res.json({
-        page,
-        totalPages: Math.ceil(totalUsers / limit),
-        totalUsers,
-        users
-      });
+        const page = parseInt(req.query.page) || 1; // Default page = 1
+        const limit = parseInt(req.query.limit) || 50; // Changed default limit to 50
+        const skip = (page - 1) * limit;
+
+        const totalUsers = await User.countDocuments();
+        const users = await User.find()
+            .sort({ createdAt: -1 }) // Sort by newest first
+            .skip(skip)
+            .limit(limit);
+
+        res.json({
+            success: true,
+            page,
+            totalPages: Math.ceil(totalUsers / limit),
+            totalUsers,
+            users
+        });
     } catch (error) {
-      res.status(500).json({ message: "Read all failed", error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: "Read all failed", 
+            error: error.message 
+        });
     }
 }
 
