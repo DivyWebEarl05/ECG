@@ -234,8 +234,8 @@ const updatePlan = async (req, res) => {
 
 const getAllPlans = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; // Default page = 1
-    const limit = 50; // Fixed limit of 50 per page
+    const page = parseInt(req.query.page) || 1; 
+    const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
 
     const totalPlans = await Plan.countDocuments();
