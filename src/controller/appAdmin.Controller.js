@@ -145,21 +145,11 @@ const appAdminchangePassword = async (req, res) => {
 
 const getAllUser = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; // Default page = 1
-        const limit = parseInt(req.query.limit) || 50; // Changed default limit to 50
-        const skip = (page - 1) * limit;
-
-        const totalUsers = await User.countDocuments();
-        const users = await User.find()
-            .sort({ createdAt: -1 }) // Sort by newest first
-            .skip(skip)
-            .limit(limit);
+        const users = await User.find().sort({ createdAt: -1 }); // Fetch all users sorted by newest first
 
         res.json({
             success: true,
-            page,
-            totalPages: Math.ceil(totalUsers / limit),
-            totalUsers,
+            totalUsers: users.length,
             users
         });
     } catch (error) {
@@ -169,7 +159,7 @@ const getAllUser = async (req, res) => {
             error: error.message 
         });
     }
-}
+};
 
 const getUserById = async (req, res) => {
     try {

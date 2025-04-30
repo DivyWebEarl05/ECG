@@ -22,51 +22,26 @@ const createTermsCondition = async (req, res) => {
 };
 
 const getAllTermsCondition = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // Changed to 50 docs per page
-    const skip = (page - 1) * limit;
-
-    const totalTerms = await TermsCondition.countDocuments();
-    const totalPages = Math.ceil(totalTerms / limit);
-
-    // Validate page number
-    if (page > totalPages && totalTerms > 0) {
-      return res.status(400).json({
+    try {
+      const termsConditions = await TermsCondition.find()
+        .sort({ createdAt: -1 })
+        .lean(); // Use lean() for better performance
+  
+      res.status(200).json({
+        success: true,
+        message: "Terms & Conditions fetched successfully",
+        totalTerms: termsConditions.length,
+        termsConditions,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
+        message: "Error fetching Terms & Conditions",
+        error: error.message,
       });
     }
-
-    const termsConditions = await TermsCondition.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
-
-    res.status(200).json({
-      success: true,
-      message: "Terms & Conditions fetched successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalTerms,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: termsConditions.length,
-      },
-      termsConditions,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching Terms & Conditions",
-      error: error.message,
-    });
-  }
-};
-
+}
+  
 const getTermsConditionById = async (req, res) => {
   try {
     const { id } = req.params;

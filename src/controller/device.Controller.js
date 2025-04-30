@@ -66,39 +66,14 @@ const updateDevice = async (req, res) => {
 
 const getAllDevices = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // 50 docs per page
-    const skip = (page - 1) * limit;
-
-    const totalDevices = await Device.countDocuments();
-    const totalPages = Math.ceil(totalDevices / limit);
-
-    // Validate page number
-    if (page > totalPages && totalDevices > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
-      });
-    }
-
     const devices = await Device.find()
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
+      .lean(); // Better performance
 
     res.status(200).json({
       success: true,
       message: "Devices retrieved successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalDevices,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: devices.length,
-      },
+      totalDevices: devices.length,
       devices,
     });
   } catch (error) {
@@ -109,6 +84,7 @@ const getAllDevices = async (req, res) => {
     });
   }
 };
+
 
 const getDeviceById = async (req, res) => {
   try {

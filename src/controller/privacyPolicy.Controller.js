@@ -22,51 +22,26 @@ const createPrivacyPolicy = async (req, res) => {
 };
 
 const getAllPrivacyPolicy = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // Changed to 50 docs per page
-    const skip = (page - 1) * limit;
-
-    const totalPrivacyPolicies = await PrivacyPolicy.countDocuments();
-    const totalPages = Math.ceil(totalPrivacyPolicies / limit);
-
-    // Validate page number
-    if (page > totalPages && totalPrivacyPolicies > 0) {
-      return res.status(400).json({
+    try {
+      const privacyPolicies = await PrivacyPolicy.find()
+        .sort({ createdAt: -1 })
+        .lean(); // Use lean() for better performance
+  
+      res.status(200).json({
+        success: true,
+        message: "Privacy Policies fetched successfully",
+        totalPrivacyPolicies: privacyPolicies.length,
+        privacyPolicies,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
+        message: "Error fetching Privacy Policies",
+        error: error.message,
       });
     }
-
-    const privacyPolicies = await PrivacyPolicy.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
-
-    res.status(200).json({
-      success: true,
-      message: "Privacy Policies fetched successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalPrivacyPolicies,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: privacyPolicies.length,
-      },
-      privacyPolicies,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching Privacy Policies",
-      error: error.message,
-    });
-  }
-};
-
+}
+  
 const getPrivacyPolicyById = async (req, res) => {
   try {
     const { id } = req.params;

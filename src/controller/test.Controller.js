@@ -87,59 +87,34 @@ const updateTest = async (req, res) => {
 };
 
 const getAllTest = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // Changed to 50 docs per page
-    const skip = (page - 1) * limit;
-
-    const totalTests = await Test.countDocuments();
-    const totalPages = Math.ceil(totalTests / limit);
-
-    // Validate page number
-    if (page > totalPages && totalTests > 0) {
-      return res.status(400).json({
+    try {
+      let tests = await Test.find()
+        .sort({ createdAt: -1 })
+        .lean(); // Use lean() for better performance
+  
+      // Add base URL to photos
+      tests = tests.map((test) => {
+        if (test.photo) {
+          const filename = test.photo.split("\\").pop().split("/").pop();
+          test.photo = BASE_URL + filename;
+        }
+        return test;
+      });
+  
+      res.status(200).json({
+        success: true,
+        message: "Tests fetched successfully",
+        totalTests: tests.length,
+        tests,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
+        message: "Error fetching tests",
+        error: error.message,
       });
     }
-
-    let tests = await Test.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
-
-    // Add base URL to photos
-    tests = tests.map((test) => {
-      if (test.photo) {
-        const filename = test.photo.split("\\").pop().split("/").pop();
-        test.photo = BASE_URL + filename;
-      }
-      return test;
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Tests fetched successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalTests,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: tests.length,
-      },
-      tests,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching tests",
-      error: error.message,
-    });
-  }
-};
+}  
 
 const getTestById = async (req, res) => {
   try {

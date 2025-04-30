@@ -74,50 +74,26 @@ const createCoupon = async (req, res) => {
 };
 
 const getAllCoupons = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // Changed to 50 docs per page
-    const skip = (page - 1) * limit;
-
-    const totalCoupons = await Coupon.countDocuments();
-    const totalPages = Math.ceil(totalCoupons / limit);
-
-    // Validate page number
-    if (page > totalPages && totalCoupons > 0) {
-      return res.status(400).json({
+    try {
+      const coupons = await Coupon.find()
+        .sort({ createdAt: -1 })
+        .lean(); 
+  
+      res.status(200).json({
+        success: true,
+        message: "Coupons fetched successfully",
+        totalCoupons: coupons.length,
+        coupons,
+      });
+    } catch (error) {
+      res.status(500).json({
         success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
+        message: "Error fetching coupons",
+        error: error.message,
       });
     }
-
-    const coupons = await Coupon.find()
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
-
-    res.status(200).json({
-      success: true,
-      message: "Coupons fetched successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalCoupons,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: coupons.length,
-      },
-      coupons,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching coupons",
-      error: error.message,
-    });
-  }
-};
+  };
+  
 
 const getCouponById = async (req, res) => {
   try {

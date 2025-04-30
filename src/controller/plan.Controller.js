@@ -231,15 +231,9 @@ const updatePlan = async (req, res) => {
   }
 };
 
-
 const getAllPlans = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; 
-    const limit = parseInt(req.query.limit) || 50;
-    const skip = (page - 1) * limit;
-
-    const totalPlans = await Plan.countDocuments();
-    let plans = await Plan.find().skip(skip).limit(limit);
+    let plans = await Plan.find().sort({ createdAt: -1 });
 
     // Add base URL to photos
     plans = plans.map(plan => {
@@ -252,17 +246,13 @@ const getAllPlans = async (req, res) => {
 
     res.json({
       message: "Plans fetched successfully",
-      page,
-      totalPages: Math.ceil(totalPlans / limit),
-      totalPlans,
-      resultsOnPage: plans.length,
+      totalPlans: plans.length,
       plans,
     });
   } catch (error) {
     res.status(500).json({ message: "Read all failed", error: error.message });
   }
-};
-
+}
 
 const getPlanById = async (req, res) => {
   try {

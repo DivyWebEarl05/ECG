@@ -28,30 +28,10 @@ const createArticle = async (req, res) => {
 
 const getAllArticles = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50; // Default 50 docs per page
-    const skip = (page - 1) * limit;
-
-    // Get total count first
-    const totalArticles = await Article.countDocuments();
-    const totalPages = Math.ceil(totalArticles / limit);
-
-    // Validate page number
-    if (page > totalPages) {
-      return res.status(400).json({
-        success: false,
-        message: `Page ${page} does not exist. Total pages available: ${totalPages}`,
-      });
-    }
-
-    // Get paginated articles
     let articles = await Article.find({})
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(); // Use lean() for better performance
+      .lean();
 
-    // Add base URL to photos
     articles = articles.map((article) => {
       if (article.photo) {
         const filename = article.photo.split("\\").pop().split("/").pop();
@@ -63,15 +43,7 @@ const getAllArticles = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Articles fetched successfully",
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalArticles,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit,
-        showing: articles.length,
-      },
+      totalArticles: articles.length,
       articles,
     });
   } catch (error) {
@@ -82,6 +54,7 @@ const getAllArticles = async (req, res) => {
     });
   }
 };
+
 
 const getArticleById = async (req, res) => {
   try {
