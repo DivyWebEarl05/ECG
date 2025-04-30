@@ -74,26 +74,23 @@ const createCoupon = async (req, res) => {
 };
 
 const getAllCoupons = async (req, res) => {
-    try {
-      const coupons = await Coupon.find()
-        .sort({ createdAt: -1 })
-        .lean(); 
-  
-      res.status(200).json({
-        success: true,
-        message: "Coupons fetched successfully",
-        totalCoupons: coupons.length,
-        coupons,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error fetching coupons",
-        error: error.message,
-      });
-    }
-  };
-  
+  try {
+    const coupons = await Coupon.find().sort({ createdAt: -1 }).lean();
+
+    res.status(200).json({
+      success: true,
+      message: "Coupons fetched successfully",
+      totalCoupons: coupons.length,
+      coupons,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching coupons",
+      error: error.message,
+    });
+  }
+};
 
 const getCouponById = async (req, res) => {
   try {
@@ -140,16 +137,23 @@ const updateCoupon = async (req, res) => {
     }
 
     if (startDate || endDate) {
-      const parsedStart = startDate
-        ? new Date(startDate)
-        : existingCoupon.startDate;
-      const parsedEnd = endDate ? new Date(endDate) : existingCoupon.endDate;
-      const now = new Date();
+      const formatDate = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      };
 
+      const parsedStart = startDate
+        ? formatDate(startDate)
+        : existingCoupon.startDate;
+      const parsedEnd = endDate ? formatDate(endDate) : existingCoupon.endDate;
+      const now = formatDate(new Date());
+
+      // Allow today's date by using <= instead of <
       if (parsedStart < now) {
         return res.status(400).json({
           success: false,
-          message: "Start date must be in the future",
+          message: "Start date cannot be in the past",
         });
       }
 
@@ -166,8 +170,8 @@ const updateCoupon = async (req, res) => {
       {
         code: code?.toUpperCase(),
         discount,
-        startDate,
-        endDate,
+        startDate: startDate ? new Date(startDate) : existingCoupon.startDate,
+        endDate: endDate ? new Date(endDate) : existingCoupon.endDate,
       },
       {
         new: true,
